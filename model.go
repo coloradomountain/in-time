@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -23,18 +22,23 @@ func InitDB(dataSourceName string) {
 	}
 }
 
-func (p *secret) getsecret(db *sql.DB) error {
-	return errors.New("Not implemented")
+func (s *secret) getsecret() error {
+	return DB.QueryRow("SELECT `secretID`, `expiration`, `contents`, `ContentsMeta`, `userID`, `name` FROM `secrets` WHERE id=?",
+		s.SecretID).Scan(&s.SecretID, &s.Expiration, &s.Contents, &s.ContentsMeta, &s.UserID, &s.Name)
 }
 
-func (p *secret) updatesecret(db *sql.DB) error {
-	return errors.New("Not implemented")
+func (s *secret) updatesecret() error {
+	_, err := DB.Exec("UPDATE `secrets` SET `secretID`=?,`expiration`=?,`contents`=?,`ContentsMeta`=?,`userID`=?,`name`=? WHERE `secretID`=?", &s.SecretID, &s.Expiration, &s.Contents, &s.ContentsMeta, &s.UserID, &s.Name)
+	return err
 }
 
-func (p *secret) deletesecret(db *sql.DB) error {
-	return errors.New("Not implemented")
+func (s *secret) deletesecret() error {
+	_, err := DB.Exec("DELETE FROM secrets WHERE secretID=?", s.SecretID)
+	return err
 }
 
-func (p *secret) createsecret(db *sql.DB) error {
-	return errors.New("Not implemented")
+func (s *secret) createsecret() error {
+
+	_, err := DB.Exec("INSERT INTO `secrets`(`secretID`, `expiration`, `contents`, `ContentsMeta`, `userID`, `name`) VALUES (?,?,?,?,?,?)", &s.SecretID, &s.Expiration, &s.Contents, &s.ContentsMeta, &s.UserID, &s.Name)
+	return err
 }
